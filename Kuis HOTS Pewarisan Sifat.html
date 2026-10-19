@@ -1,0 +1,354 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kuis HOTS Pewarisan Sifat</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky progress header, question card on the left, question navigator on the right (stacks on phones). */
+:root {
+  --bg: #eef3f1;
+  --surface: #ffffff;
+  --ink: #10262b;
+  --muted: #52676b;
+  --line: #d3dedb;
+  --accent: #0b6e63;
+  --accent-soft: #d9eeea;
+  --on-accent: #ffffff;
+  --good: #1b7a3e;
+  --good-bg: #ddf3e4;
+  --bad: #b3261e;
+  --bad-bg: #fbe3e0;
+  --f-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1a1d; --surface: #15262a; --ink: #e6f0ee; --muted: #9bb2b0; --line: #27403f;
+    --accent: #4fc7b4; --accent-soft: #1a3a38; --on-accent: #07201c;
+    --good: #6fd08c; --good-bg: #17331f; --bad: #ff8a80; --bad-bg: #3a1e1c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1a1d; --surface: #15262a; --ink: #e6f0ee; --muted: #9bb2b0; --line: #27403f;
+  --accent: #4fc7b4; --accent-soft: #1a3a38; --on-accent: #07201c;
+  --good: #6fd08c; --good-bg: #17331f; --bad: #ff8a80; --bad-bg: #3a1e1c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 400 16px/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1040px; margin: 0 auto; }
+
+/* header */
+.top { padding-block: 28px 20px; display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-end; justify-content: space-between; }
+.eyebrow { font: 500 12px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h1 { font: 800 clamp(28px, 5vw, 44px)/1.05 var(--f-display); letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 8px 0 0; max-width: 52ch; }
+.stats { display: flex; gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; min-width: 92px; }
+.stat b { display: block; font: 500 22px/1.2 var(--f-mono); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s ease; }
+
+/* layout */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } aside { order: -1; } }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: clamp(18px, 3vw, 28px); }
+.qhead { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.qno { font: 500 13px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.chip { font-size: 12.5px; font-weight: 500; background: var(--accent-soft); color: var(--accent); padding: 4px 10px; border-radius: 99px; }
+.qtext { font-size: clamp(16.5px, 2.2vw, 18.5px); line-height: 1.6; margin: 0 0 20px; max-width: 68ch; }
+
+.opts { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.opt {
+  width: 100%; text-align: left; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px;
+  transition: border-color .15s, background .15s;
+}
+.opt .let { font: 500 14px/34px var(--f-mono); text-align: center; height: 34px; border-radius: 8px; background: var(--bg); color: var(--muted); }
+.opt .txt { padding-top: 5px; overflow-wrap: anywhere; }
+.opt:hover:not([disabled]) { border-color: var(--accent); }
+.opt[disabled] { cursor: default; }
+.opt.good { border-color: var(--good); background: var(--good-bg); }
+.opt.good .let { background: var(--good); color: var(--surface); }
+.opt.bad { border-color: var(--bad); background: var(--bad-bg); }
+.opt.bad .let { background: var(--bad); color: var(--surface); }
+.opt.dim { opacity: .6; }
+
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+.btn { border: 1.5px solid var(--line); background: var(--surface); border-radius: 10px; padding: 9px 16px; font-weight: 500; }
+.btn:hover:not([disabled]) { border-color: var(--accent); }
+.btn[disabled] { opacity: .4; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover:not([disabled]) { filter: brightness(1.08); }
+.spacer { flex: 1; }
+.note { border-radius: 12px; padding: 12px 14px; margin-top: 14px; font-size: 15px; background: var(--accent-soft); }
+.note b { display: block; font-size: 12px; font-family: var(--f-mono); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+.note.good { background: var(--good-bg); }
+.note.good b { color: var(--good); }
+.note.bad { background: var(--bad-bg); }
+.note.bad b { color: var(--bad); }
+
+/* navigator */
+aside .card { padding: 16px; }
+aside h2 { font: 600 13px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.nav { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 6px; }
+.cell { height: 40px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); font: 500 14px var(--f-mono); font-variant-numeric: tabular-nums; }
+.cell.good { background: var(--good-bg); border-color: var(--good); color: var(--good); }
+.cell.bad { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.cell.cur { outline: 3px solid var(--accent); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--line); }
+.legend .g::before { background: var(--good); }
+.legend .b::before { background: var(--bad); }
+.finish { width: 100%; margin-top: 14px; }
+
+/* result */
+.score { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 4px; }
+.score b { font: 800 clamp(52px, 11vw, 84px)/1 var(--f-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.score span { font: 500 18px var(--f-mono); color: var(--muted); }
+.verdict { font: 600 20px var(--f-display); margin: 0 0 18px; }
+.sect { font: 600 13px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tags .chip { background: var(--bad-bg); color: var(--bad); }
+.rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.row { width: 100%; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 12px; }
+.row:hover { border-color: var(--accent); }
+.row .n { font: 500 13px var(--f-mono); color: var(--muted); }
+.row .t { overflow-wrap: anywhere; }
+.row .s { font: 500 12px var(--f-mono); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+.row .s.good { background: var(--good-bg); color: var(--good); }
+.row .s.bad { background: var(--bad-bg); color: var(--bad); }
+.row .s.none { background: var(--bg); color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Biologi · Kelas XII · Persiapan TKA</p>
+      <h1>Kuis HOTS Pewarisan Sifat</h1>
+      <p class="sub">20 soal pilihan ganda literasi-numerasi dengan 5 opsi, bergaya OSN dan POSI. Jawaban langsung diperiksa dan disertai pembahasan.</p>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><b id="sDone">0/20</b><span>Terjawab</span></div>
+      <div class="stat"><b id="sRight">0</b><span>Benar</span></div>
+    </div>
+  </header>
+  <div class="bar" role="progressbar" aria-label="Kemajuan" aria-valuemin="0" aria-valuemax="20" id="bar"><i id="barFill"></i></div>
+
+  <main class="layout">
+    <section id="main" aria-live="polite"></section>
+    <aside>
+      <div class="card">
+        <h2>Daftar soal</h2>
+        <div class="nav" id="nav"></div>
+        <div class="legend"><span class="g">Benar</span><span class="b">Salah</span><span>Belum</span></div>
+        <button class="btn finish" id="finish" type="button">Lihat hasil</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+var Q = [
+{t:"Dominansi tidak penuh", q:"Pada bunga pukul empat (Mirabilis jalapa), bunga merah (MM) disilangkan dengan bunga putih (mm) menghasilkan F1 berbunga merah muda (dominansi tidak penuh). F1 disilangkan sesamanya dan menghasilkan 320 tanaman F2. Berapa jumlah tanaman F2 yang jika disilangkan dengan sesama fenotipenya pasti menghasilkan keturunan seragam?", o:["80","120","160","240","320"], a:2, h:"Tanaman yang berfenotipe seragam adalah homozigot. Merah muda (Mm) jika disilangkan dengan sesamanya tetap menghasilkan 3 fenotipe.", e:"F2 = 1 MM : 2 Mm : 1 mm = 80 : 160 : 80. Hanya MM (merah) dan mm (putih) yang homozigot sehingga sesamanya menghasilkan keturunan seragam: 80 + 80 = 160. Merah muda (Mm) menghasilkan 3 fenotipe."},
+{t:"Epistasis", q:"Pada tikus, gen C menentukan pembentukan pigmen (cc = albino, apa pun genotipe B). Gen B menghasilkan bulu hitam dan b menghasilkan bulu cokelat. Dua tikus hitam CcBb disilangkan dan menghasilkan 640 anak. Berapa selisih jumlah anak berbulu hitam dengan anak berbulu cokelat?", o:["120","160","200","240","360"], a:3, h:"Ini epistasis resesif dengan rasio fenotipe 9 : 3 : 4.", e:"Rasio 9 hitam : 3 cokelat : 4 albino. Hitam = 9/16 × 640 = 360, cokelat = 3/16 × 640 = 120. Selisih = 360 − 120 = 240."},
+{t:"Peluang binomial", q:"Sepasang suami istri normal sama-sama pembawa gen albino (Aa). Mereka merencanakan 3 anak. Berapa peluang tepat 2 anak normal dan 1 anak albino (urutan kelahiran bebas)?", o:["3/64","9/64","27/64","9/16","27/32"], a:2, h:"Gunakan peluang binomial: jumlah susunan × (3/4)² × (1/4).", e:"Peluang normal = 3/4 dan albino = 1/4. Ada 3 susunan (NNA, NAN, ANN). Peluang = 3 × (3/4)² × (1/4) = 3 × 9/64 = 27/64."},
+{t:"Pautan dan rekombinasi", q:"Individu AaBb diuji silang dengan aabb dan menghasilkan 100 keturunan: AaBb = 42, aabb = 42, Aabb = 8, aaBb = 8. Berapa frekuensi rekombinasi dan bagaimana susunan gen pada individu AaBb tersebut?", o:["8%; AB/ab (cis)","16%; AB/ab (cis)","16%; Ab/aB (trans)","84%; AB/ab (cis)","50%; bebas berpilih (tidak tertaut)"], a:1, h:"Tipe parental adalah kelas yang jumlahnya terbanyak. Rekombinan adalah kelas yang jumlahnya sedikit.", e:"Kelas terbanyak (AaBb dan aabb) adalah tipe parental, sehingga gamet parental AB dan ab, artinya susunan cis (AB/ab). Rekombinan = (8 + 8)/100 = 16%. Jika bebas berpilih, frekuensinya 50%."},
+{t:"Pautan seks", q:"Seorang wanita normal pembawa buta warna menikah dengan pria buta warna. Jika pasangan tersebut memiliki 200 anak, berapa perkiraan jumlah anak berfenotipe normal dan berapa jumlah anak perempuan yang buta warna?", o:["50 dan 50","100 dan 50","100 dan 100","150 dan 50","100 dan 25"], a:1, h:"Tuliskan genotipe: XᴮXᶜ × XᶜY.", e:"Keturunan: XᴮXᶜ (perempuan normal karier), XᶜXᶜ (perempuan buta warna), XᴮY (laki-laki normal), XᶜY (laki-laki buta warna), masing-masing 1/4. Normal = XᴮXᶜ + XᴮY = 1/2 × 200 = 100. Perempuan buta warna = 1/4 × 200 = 50."},
+{t:"Golongan darah ABO", q:"Seorang ibu bergolongan darah A dan ayah bergolongan darah B memiliki anak pertama bergolongan darah O. Berapa peluang anak kedua mereka seorang perempuan bergolongan darah AB?", o:["1/2","1/4","3/8","1/8","1/16"], a:3, h:"Anak O (ii) hanya mungkin jika kedua orang tua membawa alel i.", e:"Orang tua pasti heterozigot (IᴬI) × (IᴮI), sehingga keturunan: AB, A, B, O masing-masing 1/4. Peluang AB = 1/4. Peluang perempuan = 1/2. Kejadian bebas: 1/4 × 1/2 = 1/8."},
+{t:"Hardy-Weinberg", q:"Di suatu populasi yang berada dalam keseimbangan Hardy-Weinberg, frekuensi albinisme (resesif autosomal) adalah 1 per 10.000 orang. Jika populasi berjumlah 50.000 orang, berapa perkiraan jumlah pembawa (karier) albinisme?", o:["99","500","990","4.950","9.900"], a:2, h:"q² = 1/10.000, maka cari q lalu hitung 2pq.", e:"q² = 0,0001 sehingga q = 0,01 dan p = 0,99. Frekuensi karier = 2pq = 2 × 0,99 × 0,01 = 0,0198. Jumlah karier = 0,0198 × 50.000 = 990 orang."},
+{t:"Poligeni aditif", q:"Tinggi tanaman dikendalikan 3 pasang gen poligenik aditif (A, B, C) yang sama kuat. Tanaman aabbcc setinggi 20 cm dan AABBCC setinggi 50 cm. Dua tanaman AaBbCc disilangkan. Berapa proporsi keturunan yang tingginya 35 cm?", o:["1/64","3/32","15/64","5/16","3/8"], a:3, h:"Hitung tambahan tinggi per alel dominan, lalu tentukan jumlah alel dominan yang diperlukan.", e:"Tiap alel dominan menambah (50 − 20)/6 = 5 cm. Tinggi 35 cm = 20 + 15, berarti 3 alel dominan dari 6 alel. Proporsinya C(6,3)/2⁶ = 20/64 = 5/16."},
+{t:"Uji χ²", q:"Dari persilangan dihibrid ercis heterozigot sesamanya diperoleh 160 keturunan dengan fenotipe: 85 : 35 : 28 : 12. Hipotesis nol (rasio 9:3:3:1) diuji dengan uji χ² pada taraf 5% (nilai kritis χ² untuk db = 3 adalah 7,81). Kesimpulan yang tepat adalah …", o:["χ² ≈ 1,64; db = 3; χ² < 7,81 sehingga data sesuai rasio 9:3:3:1","χ² ≈ 1,64; db = 4; χ² < 9,49 sehingga data sesuai rasio 9:3:3:1","χ² ≈ 16,4; db = 3; χ² > 7,81 sehingga data tidak sesuai rasio 9:3:3:1","χ² ≈ 1,64; db = 3; χ² > 7,81 sehingga hipotesis ditolak","χ² ≈ 0,16; db = 3; χ² < 7,81 sehingga hipotesis ditolak"], a:0, h:"Nilai harapan: 90, 30, 30, 10. Derajat bebas = jumlah kelas − 1.", e:"χ² = 25/90 + 25/30 + 4/30 + 4/10 ≈ 0,28 + 0,83 + 0,13 + 0,40 ≈ 1,64. Db = 4 − 1 = 3. Karena 1,64 < 7,81, hipotesis nol tidak ditolak, artinya penyimpangan hanya kebetulan dan data konsisten dengan 9:3:3:1."},
+{t:"Analisis silsilah", q:"Sepasang suami istri normal memiliki seorang anak perempuan (II-1) penderita penyakit autosomal resesif dan seorang anak laki-laki normal (II-2). II-2 menikah dengan wanita normal yang orang tuanya normal tetapi memiliki saudara laki-laki penderita. Berapa peluang anak pertama pasangan II-2 menderita penyakit tersebut?", o:["1/4","1/6","1/9","1/12","1/16"], a:2, h:"Orang normal yang orang tuanya sama-sama karier memiliki peluang 2/3 menjadi karier (bukan 1/2).", e:"II-2 normal dari orang tua Aa × Aa, sehingga peluang Aa = 2/3. Istrinya juga normal dari orang tua karier, sehingga peluang Aa = 2/3. Peluang anak aa = 2/3 × 2/3 × 1/4 = 4/36 = 1/9."},
+{t:"Alel letal", q:"Pada tikus, alel Y (bulu kuning) dominan terhadap y (bulu abu-abu), tetapi YY bersifat letal pada masa embrio. Lima induk betina Yy dikawinkan dengan jantan Yy, dan rata-rata tiap betina melahirkan 6 anak hidup. Berapa perkiraan total zigot yang terbentuk dan jumlah anak berbulu abu-abu?", o:["30 zigot; 10 abu-abu","40 zigot; 10 abu-abu","40 zigot; 20 abu-abu","40 zigot; 30 abu-abu","45 zigot; 15 abu-abu"], a:1, h:"Total anak hidup = 5 × 6 = 30 dan merupakan 3/4 dari seluruh zigot.", e:"Yy × Yy menghasilkan 1 YY (mati) : 2 Yy : 1 yy. Anak hidup 30 adalah 3/4 dari zigot, sehingga total zigot = 40. Anak abu-abu (yy) = 1/4 × 40 = 10, sedangkan kuning = 20."},
+{t:"Peta gen", q:"Hasil uji silang tiga lokus menunjukkan jarak antargen: A–B = 12 cM, B–C = 8 cM, dan A–C = 4 cM. Bagaimana urutan gen pada kromosom, dan berapa perkiraan rekombinan A–B dari 500 individu keturunan (abaikan pindah silang ganda)?", o:["A–B–C; 60 individu","A–C–B; 40 individu","A–C–B; 60 individu","A–C–B; 20 individu","B–A–C; 60 individu"], a:2, h:"Jarak terbesar (12) adalah jarak antara dua gen terluar.", e:"Gen terluar adalah A dan B (jarak terjauh 12 cM), maka C berada di tengah: A–C (4) + C–B (8) = 12. Urutan A–C–B. Rekombinan A–B = 12% × 500 = 60 individu."},
+{t:"Nondisjunction", q:"Seorang anak berkariotipe 47,XXY menderita buta warna (XᶜXᶜY). Ayahnya normal (XᴮY) dan ibunya normal pembawa (XᴮXᶜ). Penjelasan yang paling tepat tentang asal kelainan kromosom ini adalah …", o:["nondisjunction pada meiosis I ibu","nondisjunction pada meiosis II ibu","nondisjunction pada meiosis I ayah","nondisjunction pada meiosis II ayah","mutasi gen baru pada kromosom Y ayah"], a:1, h:"Anak mendapat dua alel Xᶜ yang identik. Dari tahap meiosis mana dua kromosom yang identik bisa berasal?", e:"Ayah tidak membawa Xᶜ, sehingga kedua Xᶜ berasal dari ibu. Gagal berpisah pada meiosis I menghasilkan ovum XᴮXᶜ (dua kromosom homolog), bukan XᶜXᶜ. Dua kromatid kembar Xᶜ hanya bisa masuk ke satu sel jika gagal berpisah pada meiosis II, menghasilkan ovum XᶜXᶜ yang dibuahi sperma Y."},
+{t:"Alel ganda", q:"Warna bulu kelinci ditentukan alel ganda dengan urutan dominansi C (agouti) > cʰ (himalaya) > c (albino). Kelinci agouti Cc dikawinkan dengan kelinci himalaya cʰc, dan menghasilkan 80 anak. Berapa perkiraan jumlah anak yang membawa minimal satu alel albino (c)?", o:["20","40","50","60","80"], a:3, h:"Tuliskan semua kombinasi gamet: C, c × cʰ, c.", e:"Keturunan: Ccʰ (agouti), Cc (agouti), cʰc (himalaya), cc (albino), masing-masing 20 individu. Yang membawa alel c: Cc, cʰc, cc = 3 × 20 = 60. Hanya Ccʰ yang tidak membawa c."},
+{t:"Pewarisan sitoplasmik", q:"Suatu penyakit disebabkan mutasi homoplasmik pada DNA mitokondria. Pasangan 1: ibu penderita × ayah normal. Pasangan 2: ayah penderita × ibu normal. Jika masing-masing pasangan memiliki banyak anak, berapa persentase anak yang diwarisi mutasi pada pasangan 1 dan pasangan 2 secara berurutan?", o:["50% dan 50%","25% dan 25%","0% dan 100%","100% dan 0%","50% dan 0%"], a:3, h:"Dari mana zigot memperoleh sitoplasma dan mitokondrianya?", e:"Mitokondria zigot hampir seluruhnya berasal dari sitoplasma sel telur (pewarisan maternal/sitoplasmik), bukan dari sperma. Mutasi homoplasmik ibu diwariskan ke 100% anak (laki-laki dan perempuan), sedangkan ayah penderita tidak mewariskan mutasi tersebut (0%)."},
+{t:"Interaksi gen", q:"Bentuk jengger ayam: R_P_ = walnut, R_pp = rose, rrP_ = pea, rrpp = single. Dua ayam walnut RrPp disilangkan dan menghasilkan 480 anak. Berapa jumlah anak yang berjengger bukan walnut dan bukan single?", o:["30","90","120","180","270"], a:3, h:"Rasio fenotipe 9 : 3 : 3 : 1. Yang dihitung adalah rose + pea.", e:"Walnut 9/16, rose 3/16, pea 3/16, single 1/16. Rose + pea = 6/16 × 480 = 180. Pilihan 270 adalah jumlah walnut, 30 adalah jumlah single."},
+{t:"Gen komplementer", q:"Pada ercis, warna ungu muncul bila terdapat gen C dan P bersamaan (C_P_), selain itu bunga putih (gen komplementer). Dua galur murni putih (CCpp × ccPP) disilangkan dan F1 semuanya ungu. F1 disilangkan sesamanya menghasilkan 400 tanaman F2. Berapa selisih jumlah bunga ungu dengan bunga putih pada F2?", o:["25","50","75","100","175"], a:1, h:"Rasio F2 pada komplementer adalah 9 : 7.", e:"F2 = 9 ungu : 7 putih. Ungu = 9/16 × 400 = 225, putih = 7/16 × 400 = 175. Selisih = 225 − 175 = 50."},
+{t:"Penetrasi gen", q:"Suatu penyakit autosomal dominan (H) memiliki penetrasi 80%, artinya hanya 80% individu yang bergenotipe H_ menunjukkan gejala. Pria heterozigot (Hh) menikah dengan wanita normal (hh) dan memiliki 100 anak. Berapa perkiraan jumlah anak yang tidak menunjukkan gejala penyakit?", o:["10","20","50","60","80"], a:3, h:"Anak tanpa gejala mencakup hh dan sebagian Hh yang tidak berpenetrasi.", e:"Hh × hh menghasilkan 50 Hh dan 50 hh. Dari 50 Hh, hanya 80% (40 anak) bergejala, 10 anak tidak bergejala. Tanpa gejala = 50 (hh) + 10 (Hh) = 60 anak."},
+{t:"Peluang Bayes", q:"Seorang wanita memiliki ayah normal dan ibu karier hemofilia (XᴴXʰ). Wanita ini menikah dengan pria normal dan telah memiliki dua anak laki-laki yang keduanya normal. Berapa peluang anak laki-laki ketiga mereka menderita hemofilia?", o:["1/2","1/4","1/5","1/8","1/10"], a:4, h:"Perbarui peluang wanita menjadi karier dengan informasi dua anak laki-laki normal (pendekatan Bayes).", e:"Peluang awal karier = 1/2. Peluang dua anak laki-laki normal jika karier = (1/2)² = 1/4, jika bukan karier = 1. Peluang karier setelah data = (1/2 × 1/4)/(1/2 × 1/4 + 1/2 × 1) = 1/5. Peluang anak laki-laki ketiga hemofilia = 1/5 × 1/2 = 1/10."},
+{t:"Hukum Mendel poli-hibrid", q:"Individu AaBbCcDd disilangkan dengan sesamanya. Seluruh gen terletak pada kromosom berbeda, mengikuti hukum Mendel, dan dominan penuh. Berapa jumlah genotipe yang berbeda pada keturunan dan berapa proporsi keturunan yang homozigot pada keempat lokus?", o:["16; 1/16","81; 1/16","81; 1/81","16; 1/256","81; 1/256"], a:1, h:"Tiap lokus Aa × Aa menghasilkan 3 genotipe, dan 1/2 di antaranya homozigot (AA atau aa).", e:"Jumlah genotipe = 3⁴ = 81 (16 adalah jumlah fenotipe 2⁴). Peluang homozigot pada satu lokus = 1/4 AA + 1/4 aa = 1/2. Untuk 4 lokus: (1/2)⁴ = 1/16."}
+];
+var N = Q.length, LET = ["A","B","C","D","E"];
+var ans = [], cur = 0, hintOpen = [], view = "quiz";
+for (var k = 0; k < N; k++) { ans.push(null); hintOpen.push(false); }
+
+var $ = function (id) { return document.getElementById(id); };
+function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+function counts() {
+  var d = 0, r = 0;
+  for (var i = 0; i < N; i++) { if (ans[i] !== null) { d++; if (ans[i] === Q[i].a) r++; } }
+  return { done: d, right: r };
+}
+
+function renderHeader() {
+  var c = counts();
+  $("sDone").textContent = c.done + "/" + N;
+  $("sRight").textContent = c.right;
+  $("barFill").style.width = (c.done / N * 100) + "%";
+  $("bar").setAttribute("aria-valuenow", c.done);
+}
+
+function renderNav() {
+  var nav = $("nav"); nav.textContent = "";
+  for (var i = 0; i < N; i++) {
+    (function (i) {
+      var cls = "cell";
+      if (ans[i] !== null) cls += ans[i] === Q[i].a ? " good" : " bad";
+      if (view === "quiz" && i === cur) cls += " cur";
+      var b = el("button", cls, String(i + 1));
+      b.type = "button";
+      b.setAttribute("aria-label", "Soal " + (i + 1) + (ans[i] === null ? ", belum dijawab" : ans[i] === Q[i].a ? ", benar" : ", salah"));
+      b.onclick = function () { go(i); };
+      nav.appendChild(b);
+    })(i);
+  }
+}
+
+function go(i) { cur = i; view = "quiz"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+function renderQuiz() {
+  var q = Q[cur], a = ans[cur], main = $("main"), done = a !== null;
+  main.textContent = "";
+  var card = el("div", "card");
+  var head = el("div", "qhead");
+  head.appendChild(el("span", "qno", "Soal " + (cur + 1) + " dari " + N));
+  head.appendChild(el("span", "chip", q.t));
+  card.appendChild(head);
+  card.appendChild(el("p", "qtext", q.q));
+
+  var list = el("ul", "opts");
+  list.setAttribute("aria-label", "Pilihan jawaban");
+  q.o.forEach(function (txt, i) {
+    var li = el("li");
+    var cls = "opt";
+    if (done) {
+      if (i === q.a) cls += " good";
+      else if (i === a) cls += " bad";
+      else cls += " dim";
+    }
+    var b = el("button", cls);
+    b.type = "button";
+    b.disabled = done;
+    b.appendChild(el("span", "let", LET[i]));
+    b.appendChild(el("span", "txt", txt));
+    b.onclick = function () { choose(i); };
+    li.appendChild(b);
+    list.appendChild(li);
+  });
+  card.appendChild(list);
+
+  if (done) {
+    var ok = a === q.a;
+    var n = el("div", "note " + (ok ? "good" : "bad"));
+    n.appendChild(el("b", null, ok ? "Benar" : "Belum tepat. Jawaban yang benar: " + LET[q.a]));
+    n.appendChild(document.createTextNode(q.e));
+    card.appendChild(n);
+  } else if (hintOpen[cur]) {
+    var hn = el("div", "note");
+    hn.appendChild(el("b", null, "Petunjuk"));
+    hn.appendChild(document.createTextNode(q.h));
+    card.appendChild(hn);
+  }
+
+  var tools = el("div", "tools");
+  var prev = el("button", "btn", "Sebelumnya"); prev.type = "button"; prev.disabled = cur === 0; prev.onclick = function () { go(cur - 1); };
+  tools.appendChild(prev);
+  if (!done) {
+    var hb = el("button", "btn", hintOpen[cur] ? "Sembunyikan petunjuk" : "Lihat petunjuk"); hb.type = "button";
+    hb.onclick = function () { hintOpen[cur] = !hintOpen[cur]; render(); };
+    tools.appendChild(hb);
+  }
+  tools.appendChild(el("span", "spacer"));
+  var last = cur === N - 1;
+  var nx = el("button", "btn primary", last ? "Lihat hasil" : "Berikutnya"); nx.type = "button";
+  nx.onclick = function () { if (last) { view = "result"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } else go(cur + 1); };
+  tools.appendChild(nx);
+  card.appendChild(tools);
+  main.appendChild(card);
+}
+
+function choose(i) { if (ans[cur] !== null) return; ans[cur] = i; render(); }
+
+function renderResult() {
+  var c = counts(), main = $("main"); main.textContent = "";
+  var pct = Math.round(c.right / N * 100);
+  var verdict = pct >= 85 ? "Sangat baik. Pemahamanmu sudah kuat." : pct >= 70 ? "Baik. Tinggal merapikan beberapa topik." : pct >= 50 ? "Cukup. Ulangi topik yang masih salah." : "Perlu belajar ulang konsep dasarnya, lalu coba lagi.";
+  var card = el("div", "card");
+  card.appendChild(el("p", "eyebrow", "Hasil latihan"));
+  var sc = el("div", "score");
+  sc.appendChild(el("b", null, String(c.right)));
+  sc.appendChild(el("span", null, "dari " + N + " soal benar · " + pct + "%"));
+  card.appendChild(sc);
+  card.appendChild(el("p", "verdict", verdict));
+  if (c.done < N) card.appendChild(el("p", "sub", (N - c.done) + " soal belum dijawab dan dihitung salah."));
+
+  var wrong = [];
+  for (var i = 0; i < N; i++) if (ans[i] !== Q[i].a) wrong.push(Q[i].t);
+  if (wrong.length) {
+    card.appendChild(el("h2", "sect", "Topik untuk diulang"));
+    var tags = el("div", "tags");
+    wrong.forEach(function (t) { tags.appendChild(el("span", "chip", t)); });
+    card.appendChild(tags);
+  }
+
+  card.appendChild(el("h2", "sect", "Tinjau per soal"));
+  var rows = el("ul", "rows");
+  for (var j = 0; j < N; j++) {
+    (function (j) {
+      var li = el("li");
+      var b = el("button", "row"); b.type = "button";
+      b.appendChild(el("span", "n", String(j + 1)));
+      b.appendChild(el("span", "t", Q[j].t));
+      var st = ans[j] === null ? ["none", "Kosong"] : ans[j] === Q[j].a ? ["good", "Benar"] : ["bad", "Salah"];
+      b.appendChild(el("span", "s " + st[0], st[1]));
+      b.onclick = function () { go(j); };
+      li.appendChild(b); rows.appendChild(li);
+    })(j);
+  }
+  card.appendChild(rows);
+
+  var tools = el("div", "tools");
+  var back = el("button", "btn", "Kembali ke soal"); back.type = "button"; back.onclick = function () { go(cur); };
+  var again = el("button", "btn primary", "Ulangi kuis"); again.type = "button";
+  again.onclick = function () { for (var k = 0; k < N; k++) { ans[k] = null; hintOpen[k] = false; } go(0); };
+  tools.appendChild(back); tools.appendChild(el("span", "spacer")); tools.appendChild(again);
+  card.appendChild(tools);
+  main.appendChild(card);
+}
+
+function render() {
+  renderHeader(); renderNav();
+  if (view === "result") renderResult(); else renderQuiz();
+}
+
+$("finish").onclick = function () { view = "result"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+document.addEventListener("keydown", function (e) {
+  if (e.ctrlKey || e.metaKey || e.altKey || view !== "quiz") return;
+  var k = e.key.toLowerCase(), idx = "abcde".indexOf(k);
+  if (idx < 0 && k >= "1" && k <= "5") idx = Number(k) - 1;
+  if (idx >= 0 && idx < 5) { choose(idx); return; }
+  if (k === "arrowright" && cur < N - 1) go(cur + 1);
+  if (k === "arrowleft" && cur > 0) go(cur - 1);
+});
+
+render();
+</script>
+
+</body></html>
